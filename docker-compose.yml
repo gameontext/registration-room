@@ -1,4 +1,4 @@
-gojava:
+regroom:
  build: ./regroom-wlpcfg
  ports:
   - "7040:9080"
@@ -6,4 +6,4 @@ gojava:
  env_file: gameon.${DOCKER_MACHINE_NAME}env
  container_name: regroom
  external_links:
-  - map
+  - couchdb

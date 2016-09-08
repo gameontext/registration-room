@@ -41,7 +41,7 @@ if (null != System.getenv("SSL_CERT"))
 def etcdEnvironment = ["LICENSE=accept", "ETCDCTL_ENDPOINT=http://etcd:4001"]
 
 task copyWAR(type: Copy) {
-    from '../board-app/build/libs/regroom-app-1.0.war'
+    from '../regroom-app/build/libs/regroom-app-1.0.war'
     into 'servers/regroom/apps/'
     rename("regroom-app-1.0.war", "regroom-app.war")
 }

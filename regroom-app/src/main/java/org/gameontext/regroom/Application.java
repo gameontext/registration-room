@@ -15,8 +15,11 @@
  *******************************************************************************/
 package org.gameontext.regroom;
 
+import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,8 +28,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.logging.Level;
+import java.util.stream.Collectors;
 
+import javax.inject.Inject;
 import javax.json.Json;
+import javax.json.JsonArrayBuilder;
 import javax.json.JsonObject;
 import javax.json.JsonObjectBuilder;
 import javax.json.JsonString;
@@ -74,9 +81,12 @@ public class Application implements ServletContextListener {
     private final static String EXIT_ID = "exitId";
     private final static String FULLNAME = "fullName";
     private final static String DESCRIPTION = "description";
+    private final static String KEY_COMMANDS = "commands";
+    private final static String KEY_ROOM_INVENTORY = "roomInventory";
     
-    private Config config = new Config();
-    
+    @Inject
+    private Config config;
+
     private Set<String> playersInRoom = Collections.synchronizedSet(new HashSet<String>());
 
     List<String> directions = Arrays.asList( "n", "s", "e", "w", "u", "d");
@@ -201,8 +211,24 @@ public class Application implements ServletContextListener {
             response.add(NAME, config.getName());
             response.add(FULLNAME, config.getFullname());
             response.add(DESCRIPTION, config.getDescription());
+            addCommands(response);
+            addObjects(response);
             sendRemoteTextMessage(session, "player," + userid + "," + response.build().toString());
         }
+    }
+    
+    private void addObjects(JsonObjectBuilder responseBuilder) {
+        JsonArrayBuilder objs = Json.createArrayBuilder();
+        objs.add("Notice Board");
+        responseBuilder.add(KEY_ROOM_INVENTORY, objs.build());
+    }
+    
+    private void addCommands(JsonObjectBuilder responseBuilder) {
+        JsonObjectBuilder content = Json.createObjectBuilder();
+        content.add("/register", "Register one of your rooms for this event.");
+        content.add("/notices", "View any special notices for this event.");
+
+        responseBuilder.add(KEY_COMMANDS, content.build());
     }
 
     // remove a player from the room.
@@ -260,7 +286,29 @@ public class Application implements ServletContextListener {
             }
             return;
         }
+        
+        if (lowerContent.startsWith("/examine") ) {
+            if(lowerContent.contains("notice board")) {
+                String response = getNotices();
+                sendMessageToRoom(session, null, response, userid);
+                return;
+            }
+        }
 
+        if(lowerContent.startsWith("/register ")) {
+            //register a room for the competition
+            String response = registerRoom(userid);
+            sendMessageToRoom(session, null, response, userid);
+            return;
+        }
+        
+        if(lowerContent.equals("/notices")) {
+            //read any special notices relating to this event
+            String response = getNotices();
+            sendMessageToRoom(session, null, response, userid);
+            return;
+        }
+        
         // reject all unknown commands
         if (lowerContent.startsWith("/")) {
             sendMessageToRoom(session, null, "Unrecognised command - sorry :-(", userid);
@@ -272,6 +320,28 @@ public class Application implements ServletContextListener {
         return;
     }
 
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    // Registration / event methods..
+    ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    private String registerRoom(String userid) {
+        return "";
+    }
+    
+    private String getNotices() {
+        InputStream stream = getClass().getResourceAsStream("/notices.txt");
+        if(stream == null) {
+            Log.log(Level.WARNING, null, "A notices.txt file could not be found, this may be an error or expected");
+            return "There is no more information available about this event";
+        }
+        try (BufferedReader buffer = new BufferedReader(new InputStreamReader(stream))) {
+            return buffer.lines().filter(s -> !s.startsWith("#")).collect(Collectors.joining());
+        } catch (IOException e) {
+            Log.log(Level.SEVERE, e, "A notices.txt file could not read.");
+            return "There was an error reading the notices file";
+        }
+    }
+    
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // Reply methods..
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -1,0 +1,11 @@
+#This file contains any specific notices for your competition
+#Lines which start with a hash will not be output
+#Players view this text by typing /notices when in this room
+#``` is used to preserve the formatting of the text as is
+```
+Notices
+-------
+
+Here are some special things that you need to know about this event.
+```
+

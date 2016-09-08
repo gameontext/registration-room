@@ -16,7 +16,10 @@
 package org.gameontext.regroom;
 
 import java.io.StringReader;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.json.Json;
 import javax.json.JsonArray;
 import javax.json.JsonObject;
@@ -30,11 +33,8 @@ import javax.servlet.ServletContextEvent;
  * generating any necessary data for a successful room registration.
  * 
  */
+@ApplicationScoped
 public class Config {
-	//You should change this name to avoid confusion with other sample rooms registered with Game On.
-    private final String name = "AnotherSimpleRoom";
-    private final String fullName = "A Very Simple Room.";
-    private final String description = "You are in the worlds most simple room, there is nothing to do here.";
 	
     //default registration is with the live site, although this can be changed via environment variables
     private String registrationUrl = "https://game-on.org/map/v1/sites";
@@ -42,13 +42,19 @@ public class Config {
     private String userId;
     private String key;
     private final boolean valid;
+    private String name;
+    private String fullName;
+    private String description;
 
     public Config() {
         // credentials, read from the cf environment, and
         // originally obtained from the gameon instance to connect to.
         userId = System.getenv("GAMEON_ID");
         key = System.getenv("GAMEON_SECRET");
+        name = System.getenv("REGISTRATION_SERVICE_ID");
+        fullName = "Registration room for " + name;
         String url = System.getenv("GAMEON_MAP_URL");
+        description = System.getenv("REGISTRATION_SERVICE_DESC");
         if(url != null) {
         	registrationUrl = url;	//map registration URL has been overwritten by an env var
         }
@@ -119,9 +125,19 @@ public class Config {
             endPointUrl = "ws://"+firstUriAsString.getString()+contextPath+"/room";
             System.out.println("Using CF details of "+endPointUrl);
         }else{
+            String local = System.getenv("LOCAL_ENDPOINT");
+            if(local == null) {
+                //see if we can determine our ip address in case this is running inside a docker container
+                try {
+                    local = InetAddress.getLocalHost().getHostAddress() + ":9080/regsvc";
+                } catch (UnknownHostException e1) {
+                    local = "localhost:9080/regsvc";   //default location running locally if not overridden by environment
+                }
+                
+            }
             System.out.println("This room is intended to obtain it's configuration from the CF environment");
-            System.out.println("Assuming that this room is running on localhost port 9080 (this should match the config in server.xml)");
-            endPointUrl = "ws://localhost:9080/room";
+            System.out.println("Assuming that this room is running on " + local);
+            endPointUrl = "ws://" + local + "/room";
         }
 		return endPointUrl;
 	}

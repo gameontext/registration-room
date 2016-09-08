@@ -14,3 +14,4 @@ hs_err_pid*
 build/
 bin/
 docker-compose.override.yml
+gameon.dev.env
