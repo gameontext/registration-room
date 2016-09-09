@@ -32,10 +32,6 @@
     <httpEndpoint host="*" httpPort="9080" httpsPort="9443"
         id="defaultHttpEndpoint" />
 
-    <!-- Where to find services -->
-    <jndiEntry jndiName="mapUrl" value="${env.MAP_SERVICE_URL}"/>
-    <jndiEntry jndiName="regId" value="${env.REGISTRATION_SERVICE_ID}"/>
-
     <keyStore id="defaultKeyStore" password="wibble"/>
 
     <logging consoleLogLevel="INFO" traceSpecification="*=info:org.gameontext.regroom.*=all"/>

@@ -37,7 +37,8 @@ import javax.servlet.ServletContextEvent;
 public class Config {
 	
     //default registration is with the live site, although this can be changed via environment variables
-    private String registrationUrl = "https://game-on.org/map/v1/sites";
+    private String mapUrl = getOptionalEnvVar("MAP_SERVICE_URL", "https://game-on.org/map/v1/sites");
+    private String registrationUrl = getOptionalEnvVar("REGISTRATION_SERVICE_URL", "https://game-on.org/regsvc/v1/register");
     private String endPointUrl;
     private String userId;
     private String key;
@@ -51,13 +52,9 @@ public class Config {
         // originally obtained from the gameon instance to connect to.
         userId = System.getenv("GAMEON_ID");
         key = System.getenv("GAMEON_SECRET");
-        name = System.getenv("REGISTRATION_SERVICE_ID");
+        name = System.getenv("EVENT_ID");
+        description = System.getenv("EVENT_DESC");
         fullName = "Registration room for " + name;
-        String url = System.getenv("GAMEON_MAP_URL");
-        description = System.getenv("REGISTRATION_SERVICE_DESC");
-        if(url != null) {
-        	registrationUrl = url;	//map registration URL has been overwritten by an env var
-        }
         if(userId == null || key == null){
             System.out.println("This room is intended to obtain it's configuration from the environment");
             System.out.println("GameOn! userid or secret is missing from the environment.");
@@ -66,7 +63,18 @@ public class Config {
             valid = false;
             return;
         }
+        if((name == null) || (description == null)) {
+            System.out.println("This room is intended to obtain it's configuration from the environment");
+            System.out.println("The event ID or description is missing from the environment.");
+            valid = false;
+            return;
+        }
         valid = true;
+    }
+    
+    private String getOptionalEnvVar(String name, String defvalue) {
+        String value = System.getenv(name);
+        return (value == null) ? defvalue : value;
     }
     
     /**
@@ -108,8 +116,8 @@ public class Config {
         return registrationPayload.build().toString();
     }
 
-	public String getRegistrationUrl() {
-		return registrationUrl;
+	public String getMapUrl() {
+		return mapUrl;
 	}
 
 	private String getEndPointUrl(ServletContextEvent e) {
@@ -129,9 +137,9 @@ public class Config {
             if(local == null) {
                 //see if we can determine our ip address in case this is running inside a docker container
                 try {
-                    local = InetAddress.getLocalHost().getHostAddress() + ":9080/regsvc";
+                    local = InetAddress.getLocalHost().getHostAddress() + ":9080/regroom";
                 } catch (UnknownHostException e1) {
-                    local = "localhost:9080/regsvc";   //default location running locally if not overridden by environment
+                    local = "localhost:9080/regroom";   //default location running locally if not overridden by environment
                 }
                 
             }
@@ -172,5 +180,9 @@ public class Config {
 		return description;
 	}
 	
+	public String getRegistrationsUrl() {
+	    return registrationUrl;
+	}
+
 	
 }

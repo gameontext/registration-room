@@ -54,6 +54,8 @@ import javax.websocket.RemoteEndpoint.Basic;
 import javax.websocket.Session;
 import javax.websocket.server.ServerEndpoint;
 
+import org.gameontext.regroom.client.RegistrationServiceClient;
+import org.gameontext.regroom.models.Registration;
 import org.gameontext.util.reg.RegistrationUtility;
 import org.gameontext.util.reg.RegistrationUtility.HTTP_METHOD;
 
@@ -86,6 +88,9 @@ public class Application implements ServletContextListener {
     
     @Inject
     private Config config;
+    
+    @Inject
+    private RegistrationServiceClient regclient;
 
     private Set<String> playersInRoom = Collections.synchronizedSet(new HashSet<String>());
 
@@ -108,7 +113,7 @@ public class Application implements ServletContextListener {
 	        RegistrationUtility regutil = new RegistrationUtility();
 	        regutil.setId(config.getUserId());
 	        regutil.setSecret(config.getKey());
-	        regutil.setUrl(config.getRegistrationUrl());
+	        regutil.setUrl(config.getMapUrl());
 	        
 	        // attempt to regsiter this room
 	        regutil.setMethod(HTTP_METHOD.POST);
@@ -130,7 +135,7 @@ public class Application implements ServletContextListener {
 	            throw new RuntimeException(ex);
 	        }
     	} else {
-    		System.out.println("Not registering as no valid config is available");
+    		System.out.println("Cannot register with the map service as no valid config is available");
     	}
     }
 
@@ -297,7 +302,8 @@ public class Application implements ServletContextListener {
 
         if(lowerContent.startsWith("/register ")) {
             //register a room for the competition
-            String response = registerRoom(userid);
+            String siteId = lowerContent.substring("/regsiter ".length()).trim();
+            String response = registerRoom(userid, siteId);
             sendMessageToRoom(session, null, response, userid);
             return;
         }
@@ -308,6 +314,15 @@ public class Application implements ServletContextListener {
             sendMessageToRoom(session, null, response, userid);
             return;
         }
+        
+        if(lowerContent.equals("/rooms")) {
+            //display a list of the currently registered rooms for this event
+            String response = getRegisteredRooms();
+            sendMessageToRoom(session, null, response, userid);
+            return;
+        }
+        
+        
         
         // reject all unknown commands
         if (lowerContent.startsWith("/")) {
@@ -324,8 +339,12 @@ public class Application implements ServletContextListener {
     // Registration / event methods..
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
     
-    private String registerRoom(String userid) {
-        return "";
+    private String registerRoom(String userid, String siteId) {
+        Registration reg = new Registration();
+        reg.setEventId(config.getName());
+        reg.setGameonId(userid);
+        reg.setSiteId(siteId);
+        return regclient.registerRoom(reg);
     }
     
     private String getNotices() {
@@ -340,6 +359,18 @@ public class Application implements ServletContextListener {
             Log.log(Level.SEVERE, e, "A notices.txt file could not read.");
             return "There was an error reading the notices file";
         }
+    }
+    
+    private String getRegisteredRooms() {
+         List<Registration> registrations =  regclient.getRoomsForEvent();
+         if(registrations.isEmpty()) {
+             return "It doesn't look like there are any rooms currently registered.";
+         }
+         StringBuilder builder = new StringBuilder("The following rooms are registered for this event");
+         for(Registration reg : registrations) {
+             builder.append(reg.getSiteId());
+         }
+         return builder.toString();
     }
     
     ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
