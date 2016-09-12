@@ -232,6 +232,7 @@ public class Application implements ServletContextListener {
         JsonObjectBuilder content = Json.createObjectBuilder();
         content.add("/register", "Register one of your rooms for this event.");
         content.add("/notices", "View any special notices for this event.");
+        content.add("/rooms", "Show all rooms registered for this event");
 
         responseBuilder.add(KEY_COMMANDS, content.build());
     }
