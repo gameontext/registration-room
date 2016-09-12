@@ -354,12 +354,14 @@ public class Application implements ServletContextListener {
             Log.log(Level.WARNING, null, "A notices.txt file could not be found, this may be an error or expected");
             return "There is no more information available about this event";
         }
+        StringBuilder out = new StringBuilder();
         try (BufferedReader buffer = new BufferedReader(new InputStreamReader(stream))) {
-            return buffer.lines().filter(s -> !s.startsWith("#")).collect(Collectors.joining());
+            buffer.lines().forEach(data -> { if(!data.startsWith("#")) out.append(data + "\n"); });
         } catch (IOException e) {
             Log.log(Level.SEVERE, e, "A notices.txt file could not read.");
             return "There was an error reading the notices file";
         }
+        return out.toString();
     }
     
     private String getRegisteredRooms() {
@@ -367,9 +369,9 @@ public class Application implements ServletContextListener {
          if(registrations.isEmpty()) {
              return "It doesn't look like there are any rooms currently registered.";
          }
-         StringBuilder builder = new StringBuilder("The following rooms are registered for this event");
+         StringBuilder builder = new StringBuilder("The following rooms are registered for this event\n");
          for(Registration reg : registrations) {
-             builder.append(reg.getSiteId());
+             builder.append("* " + reg.getSiteId() + "\n");
          }
          return builder.toString();
     }
