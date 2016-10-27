@@ -36,6 +36,9 @@ MAP_SERVICE_URL=<location of the Game On! map service>
 REGISTRATION_SERVICE_URL=<location of the Game On! registration service>
 ```
 
+The default locations point to the live instance of Game On! i.e. the one hosted at game-on.org. However, if you are
+running your own copy, then overriding these values will allow you to register with that version of the game.
+
 ### Setting environment variables
 
 There are a couple of ways of setting environment variables, some of which depend on how you are going to
