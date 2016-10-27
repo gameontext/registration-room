@@ -38,7 +38,7 @@ public class Config {
 	
     //default registration is with the live site, although this can be changed via environment variables
     private String mapUrl = getOptionalEnvVar("MAP_SERVICE_URL", "https://game-on.org/map/v1/sites");
-    private String registrationUrl = getOptionalEnvVar("REGISTRATION_SERVICE_URL", "https://game-on.org/regsvc/v1/register");
+    private String registrationUrl = getOptionalEnvVar("REGISTRATION_SERVICE_URL", "http://game-on.org:9009/regsvc/v1/register");
     private String endPointUrl;
     private String userId;
     private String key;

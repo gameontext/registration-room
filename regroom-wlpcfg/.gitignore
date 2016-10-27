@@ -11,3 +11,4 @@
 /servers/*/workarea
 /servers/*/configDropins/overrides
 /servers/*/resources
+/servers/*/server.env
