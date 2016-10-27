@@ -59,4 +59,14 @@ room. There are two places that you can customise
 to the hosted room i.e. not via Game On!. This is potentially useful to describe things in more detail, rather than presenting a
 wall of text in the notices.txt file.
 
-## 
+## Room commands
+
+There are a number of commands that developers (i.e. players) can type in when in the registration room.
+
+* **/notices** : display the specific rules for registering a room (can also use **/examine notice board**).
+* **/register <siteID>** : this will register the specified room for the event (the site id can be found on the rooms page https://game-on.org/#/play/myrooms).
+* **/rooms** : show a list of rooms registered for this event.
+
+## Viewing registered rooms
+
+Rooms that have been registered for events can be viewed outside of actual game environment via the registration service. Full instructions can be found at https://github.com/gameontext/registration-service/blob/master/README.md.
