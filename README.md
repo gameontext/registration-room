@@ -23,8 +23,8 @@ LOCAL_ENDPOINT=<this is where Game On! will connect to your room>
 
 The registration room is a normal Game On! room, which means that you will need some Game On!
 credentials in order to register it (the GAMEON_ID and GAMEON_SECRET values). If you haven't already
-done so, then you can sign up for Game On at https://game-on.org, or if you are already registered then
-your ID and SECRET can be found at https://game-on.org/#/play/myrooms.
+done so, then you can sign up for Game On at https://gameontext.org, or if you are already registered then
+your ID and SECRET can be found at https://gameontext.org/#/play/myrooms.
 
 ### Room configuration (optional)
 
@@ -36,7 +36,7 @@ MAP_SERVICE_URL=<location of the Game On! map service>
 REGISTRATION_SERVICE_URL=<location of the Game On! registration service>
 ```
 
-The default locations point to the live instance of Game On! i.e. the one hosted at game-on.org. However, if you are
+The default locations point to the live instance of Game On! i.e. the one hosted at gameontext.org. However, if you are
 running your own copy, then overriding these values will allow you to register with that version of the game.
 
 ### Setting environment variables
@@ -67,7 +67,7 @@ wall of text in the notices.txt file.
 There are a number of commands that developers (i.e. players) can type in when in the registration room.
 
 * **/notices** : display the specific rules for registering a room (can also use **/examine notice board**).
-* **/register <siteID>** : this will register the specified room for the event (the site id can be found on the rooms page https://game-on.org/#/play/myrooms).
+* **/register <siteID>** : this will register the specified room for the event (the site id can be found on the rooms page https://gameontext.org/#/play/myrooms).
 * **/rooms** : show a list of rooms registered for this event.
 
 ## Viewing registered rooms
